@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Data Warga GKJ Danukusuman</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3a5c;
+            --secondary: #2d6a9f;
+            --accent: #f0a500;
+        }
+        body { background: #f4f6f9; }
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            width: 260px;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        .sidebar .brand {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .sidebar .brand i { font-size: 40px; color: var(--accent); }
+        .sidebar .brand h6 { color: white; margin: 8px 0 0; font-weight: 700; font-size: 13px; }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 2px 10px;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        .sidebar .nav-link i { width: 20px; margin-right: 8px; }
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+        .topbar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card.green { border-left-color: #28a745; }
+        .stat-card.orange { border-left-color: #fd7e14; }
+        .stat-card.red { border-left-color: #dc3545; }
+        .stat-card.purple { border-left-color: #6f42c1; }
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .stat-card .label { color: #6c757d; font-size: 13px; }
+        .stat-card .icon {
+            font-size: 40px;
+            opacity: 0.15;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+        }
+        .card-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .card-section h6 {
+            color: var(--primary);
+            font-weight: 700;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .badge-wilayah {
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .ultah-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+        .ultah-item:last-child { border-bottom: none; }
+        @media (max-width: 768px) {
+            .sidebar { width: 0; overflow: hidden; }
+            .sidebar.show { width: 260px; }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="brand">
+            <i class="fas fa-church"></i>
+            <h6>Pendataan Warga Gereja</h6>
+            <small style="color:rgba(255,255,255,0.5); font-size:11px;">Sistem Informasi Jemaat</small>
+        </div>
+        <nav class="mt-3">
+            <a href="dashboard.html" class="nav-link active">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="jemaat.html" class="nav-link">
+                <i class="fas fa-users"></i> Data Jemaat
+            </a>
+            <a href="keluarga.html" class="nav-link">
+                <i class="fas fa-home"></i> Data Keluarga
+            </a>
+            <a href="laporan.html" class="nav-link">
+                <i class="fas fa-file-alt"></i> Laporan
+            </a>
+            <div id="menuSuperAdmin" class="d-none">
+                <hr style="border-color:rgba(255,255,255,0.1); margin:10px 15px;">
+                <small style="color:rgba(255,255,255,0.4); padding:0 20px; font-size:11px;">ADMINISTRASI</small>
+                <a href="#" class="nav-link" onclick="showUserManagement()">
+                    <i class="fas fa-user-cog"></i> Kelola User
+                </a>
+            </div>
+        </nav>
+        <div style="position:absolute; bottom:20px; left:0; right:0; padding:0 15px;">
+            <div style="background:rgba(255,255,255,0.1); border-radius:10px; padding:12px;">
+                <div style="color:white; font-size:13px;" id="userInfo"></div>
+                <button class="btn btn-sm btn-outline-light mt-2 w-100" onclick="Auth.logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i> Keluar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div>
+                <h5 class="mb-0 fw-bold" style="color:var(--primary)">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </h5>
+                <small class="text-muted" id="currentDate"></small>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary" id="roleBadge"></span>
+                <span id="namaUser" class="fw-semibold"></span>
+            </div>
+        </div>
+
+        <!-- STATISTIK CARDS -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-card position-relative">
+                    <i class="fas fa-users icon"></i>
+                    <div class="number" id="statTotalJemaat">0</div>
+                    <div class="label">Total Jemaat</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card green position-relative">
+                    <i class="fas fa-home icon"></i>
+                    <div class="number" id="statTotalKeluarga">0</div>
+                    <div class="label">Total Keluarga</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card orange position-relative">
+                    <i class="fas fa-child icon">
